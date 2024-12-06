@@ -72,9 +72,14 @@ def detect_objects_yolo(yolo_model, color_image, process_frame):
 
 if __name__ == '__main__':
     #파라미터 설정
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser()   
+    
+    #비디오 파일은 로컬에 맞게 수정 필요
     parser.add_argument("--video", default="temp.mp4", help="Input video file.")
+    #DeepLabv3+ model.xml 모델의 경로는 로컬에 맞게 수정 필요
     parser.add_argument("--deep_model1", default="model\\road-segmentation-adas-0001\\FP16-INT8\\road-segmentation-adas-0001.xml", help="Path of the DeepLabv3+ model.xml.")
+    
+    #yolov8n.pt은 별도로 다운로드 받아 경로를 로컬에 맞게 수정 필요   
     parser.add_argument("--yolo_model", default="model\\yolov8n.pt", help="Path of the Ultralytics YOLO model.")
     parser.add_argument('--vidfps', type=int, default=30, help='FPS of the output video.')
     args = parser.parse_args()
