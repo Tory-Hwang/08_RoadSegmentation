@@ -7,9 +7,21 @@ import time
 from ultralytics import YOLO
 from openvino.runtime import Core
 
-# 현재 디렉토리 설정
-script_directory = os.path.dirname(os.path.abspath(__file__))
-os.chdir(script_directory)
+
+#=================================================================
+#초기값 설정
+#=================================================================
+#실행 경로 설정 
+# 경로 설정
+script_dir = os.path.dirname(os.path.abspath(__file__))
+os.chdir(script_dir)
+Models_dir = os.path.abspath(os.path.join(script_dir, "../00_Models"))
+Videos_dir = os.path.abspath(os.path.join(script_dir, "../00_Sample_Video"))
+video_file = os.path.join(Videos_dir, "input","road.mp4" )
+yolo_model_file = os.path.join(Models_dir, "yolov8n.pt" )
+road_seg_model_file  = os.path.join(Models_dir, "road-segmentation-adas-0001", "FP16-INT8", "road-segmentation-adas-0001.xml" )
+video_out_file = os.path.join(Videos_dir, "output","road_seg_output_video.mp4" )
+
 
 fps = ""
 framecount = 0
@@ -75,19 +87,19 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()   
     
     #비디오 파일은 로컬에 맞게 수정 필요
-    parser.add_argument("--video", default="temp.mp4", help="Input video file.")
+    parser.add_argument("--video", default=video_file, help="Input video file.")
     #DeepLabv3+ model.xml 모델의 경로는 로컬에 맞게 수정 필요
-    parser.add_argument("--deep_model1", default="model\\road-segmentation-adas-0001\\FP16-INT8\\road-segmentation-adas-0001.xml", help="Path of the DeepLabv3+ model.xml.")
+    parser.add_argument("--deep_model1", default= road_seg_model_file, help="Path of the DeepLabv3+ model.xml.")
     
     #yolov8n.pt은 별도로 다운로드 받아 경로를 로컬에 맞게 수정 필요   
-    parser.add_argument("--yolo_model", default="model\\yolov8n.pt", help="Path of the Ultralytics YOLO model.")
+    parser.add_argument("--yolo_model", default= yolo_model_file, help="Path of the Ultralytics YOLO model.")
     parser.add_argument('--vidfps', type=int, default=30, help='FPS of the output video.')
     args = parser.parse_args()
 
     cap = cv2.VideoCapture(args.video)
     cap.set(cv2.CAP_PROP_FPS, args.vidfps)
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    out = cv2.VideoWriter('output_video.mp4', fourcc, args.vidfps, (640, 640))
+    out = cv2.VideoWriter(video_out_file, fourcc, args.vidfps, (640, 640))
 
     n1, c1, h1, w1, compiled_model1, input_blob1, output_blob1 = load_openvino_model(args.deep_model1, device_name="CPU")
     yolo_model = YOLO(args.yolo_model)
